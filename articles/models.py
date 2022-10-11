@@ -6,8 +6,8 @@ class Article(models.Model):
     text = models.TextField(verbose_name='Текст')
     published_at = models.DateTimeField(verbose_name='Дата публикации')
     image = models.ImageField(null=True, blank=True, verbose_name='Изображение', )
-    category = models.ManyToManyField('Category', through='Relations', through_fields=('article', 'category'),
-                                      null=True)
+    categories = models.ManyToManyField('Category', related_name='articles', through='Relations',
+                                        through_fields=('article', 'category'))
 
     class Meta:
         verbose_name = 'Статья'
@@ -31,6 +31,13 @@ class Category(models.Model):
 
 
 class Relations(models.Model):
-    article = models.ForeignKey(Article, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='scope')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='scope')
     main = models.BooleanField(verbose_name='Главная категория')
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
+    def __str__(self):
+        return str(self.category) if self.category else ''
